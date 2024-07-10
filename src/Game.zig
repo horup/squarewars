@@ -21,13 +21,19 @@ pub fn update(self: *Game, dt: f32) void {
     const center_x = WIDTH / 2.0;
     const center_y = HEIGHT / 2.0;
     const height = 32.0;
+
     {
         const s = "Square";
         platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, center_y - height, height, Platform.Color{});
     }
     {
         const s = "Wars!";
-        platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, center_y + height - height, height, Platform.Color{});
+        platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, center_y, height, Platform.Color{});
+    }
+
+    {
+        const s = "---- Press Space ----";
+        platform.drawText(s, center_x - platform.measureText(s, height / 2.0) / 2.0, center_y + height + height / 2.0, height / 2.0, Platform.Color{});
     }
     self.time_elapsed_sec += dt;
 }
