@@ -12,16 +12,30 @@ const RaylibPlatform = struct {
 
     allocator: std.mem.Allocator,
 
+    fn scale(_: *RaylibPlatform) i32 {
+        return 2;
+    }
+
     fn init(allocator: std.mem.Allocator) RaylibPlatform {
         return RaylibPlatform{ .allocator = allocator };
     }
 
     fn platform(this: *RaylibPlatform) Platform {
-        return Platform{ .allocator = this.allocator, .ptr = this, .vtable = .{ .drawText = @ptrCast(&drawText) } };
+        return Platform{ .allocator = this.allocator, .ptr = this, .vtable = .{ .drawText = @ptrCast(&drawText), .measureText = @ptrCast(&measureText) } };
     }
 
-    fn drawText(_: Self, text: []const u8, posX: f32, posY: f32, height: f32, color: ray.Color) void {
-        ray.DrawText(@ptrCast(text), @intFromFloat(posX), @intFromFloat(posY), @intFromFloat(height), color);
+    fn drawText(self: *Self, text: []const u8, posX: f32, posY: f32, height: f32, color: ray.Color) void {
+        const c = self.scale();
+        const x: i32 = @intFromFloat(posX);
+        const y: i32 = @intFromFloat(posY);
+        const h: i32 = @intFromFloat(height);
+        ray.DrawText(@ptrCast(text), x * c, y * c, h * c, color);
+    }
+
+    fn measureText(_: *Self, text: []const u8, height: f32) f32 {
+        const h: i32 = @intFromFloat(height);
+        const w = ray.MeasureText(@ptrCast(text), h);
+        return @floatFromInt(w);
     }
 };
 
@@ -31,6 +45,7 @@ pub fn main() !void {
 
     ray.SetConfigFlags(ray.FLAG_MSAA_4X_HINT | ray.FLAG_VSYNC_HINT);
     ray.InitWindow(width, height, "SquareWars!");
+
     defer ray.CloseWindow();
 
     var gpa = std.heap.GeneralPurposeAllocator(.{ .stack_trace_frames = 8 }){};
@@ -48,14 +63,11 @@ pub fn main() !void {
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
         defer ray.EndDrawing();
-
         ray.ClearBackground(ray.BLACK);
-
-        ray.DrawText("Congrats! You created your first window!", 190, 200, 20, ray.BLACK);
-
         const dt = ray.GetFrameTime();
+        game.update(dt);
+
         //const dynamic = try std.fmt.allocPrintZ(allocator, "running since {d} seconds", .{seconds});
         //defer allocator.free(dynamic);
-        game.update(dt);
     }
 }
