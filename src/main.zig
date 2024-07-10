@@ -1,20 +1,28 @@
 const std = @import("std");
+const Platform = @import("platform.zig");
 const ray = @cImport({
     @cInclude("raylib.h");
     @cInclude("raymath.h");
     @cInclude("rlgl.h");
 });
 
-pub fn main() !void {
-    try ray_main();
-}
+const RaylibPlatform = struct {
+    allocator: std.mem.Allocator,
+    fn platform(this: RaylibPlatform) Platform {
+        return Platform{ .allocator = this.allocator, .ptr = this, .vtable = .{ .drawText = drawText } };
+    }
 
-fn ray_main() !void {
+    fn drawText(_: @This(), text: *const u8, posX: f32, posY: f32, height: f32, color: i32) void {
+        ray.DrawText(text, posX, posY, height, color);
+    }
+};
+
+pub fn main() !void {
     const width = 800;
     const height = 450;
 
     ray.SetConfigFlags(ray.FLAG_MSAA_4X_HINT | ray.FLAG_VSYNC_HINT);
-    ray.InitWindow(width, height, "zig raylib example");
+    ray.InitWindow(width, height, "SquareWars!");
     defer ray.CloseWindow();
 
     var gpa = std.heap.GeneralPurposeAllocator(.{ .stack_trace_frames = 8 }){};
