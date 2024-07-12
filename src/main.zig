@@ -86,7 +86,6 @@ pub fn main() !void {
         ray.ClearBackground(ray.BLACK);
         const dt = ray.GetFrameTime();
         game.update(dt);
-        ray.DrawRectangle(10, 10, 10, 10, ray.WHITE);
 
         //const dynamic = try std.fmt.allocPrintZ(allocator, "running since {d} seconds", .{seconds});
         //defer allocator.free(dynamic);

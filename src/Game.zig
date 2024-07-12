@@ -1,5 +1,7 @@
 const std = @import("std");
 const Platform = @import("platform.zig");
+const Thing = @import("Thing.zig");
+const Arena = @import("Arena.zig");
 const Game = @This();
 const WIDTH: f32 = 320.0;
 const HEIGHT: f32 = 240.0;
@@ -7,16 +9,18 @@ const State = enum {
     title,
     gaming,
 };
+things: Arena(Thing),
 state: State = State.title,
 platform: Platform,
 score: i32 = 0.0,
 time_elapsed: f32 = 0.0,
 timer_1hz: f32 = 0.0,
-delay_countdown: f32 = 2.0,
+delay_countdown: f32 = 1.0,
 
 pub fn init(platform: Platform) Game {
     return Game{
         .platform = platform,
+        .things = Arena(Thing).init(platform.allocator),
     };
 }
 
