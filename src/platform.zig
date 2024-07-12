@@ -7,8 +7,8 @@ pub const Color = struct {
 };
 
 pub const Key = enum(i32) {
-    up = 1,
-    down = 2,
+    up = 265,
+    down = 264,
     left = 3,
     right = 4,
     space = 32,
