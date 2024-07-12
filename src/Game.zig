@@ -99,7 +99,7 @@ fn update_gaming(self: *Game, dt: f32) void {
         const size = thing.size;
         const color = .{ .g = 255 };
         if (thing.update) |f| {
-            f(@ptrCast(self), thing);
+            f(@ptrCast(self), thing, dt);
         }
         platform.drawSquare(x, y, size, color);
     }
