@@ -47,9 +47,16 @@ fn update_title(self: *Game, _: f32) void {
     }
 }
 
+fn update_gaming(_: *Game, _: f32) void {}
+
 pub fn update(self: *Game, dt: f32) void {
-    if (self.state == State.title) {
-        self.update_title(dt);
+    switch (self.state) {
+        State.title => {
+            self.update_title(dt);
+        },
+        State.gaming => {
+            self.update_gaming(dt);
+        },
     }
 
     self.time_elapsed_sec += dt;
