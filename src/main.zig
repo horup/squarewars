@@ -21,7 +21,12 @@ const RaylibPlatform = struct {
     }
 
     fn platform(this: *RaylibPlatform) Platform {
-        return Platform{ .allocator = this.allocator, .ptr = this, .vtable = .{ .drawText = @ptrCast(&drawText), .measureText = @ptrCast(&measureText) } };
+        return Platform{ .allocator = this.allocator, .ptr = this, .vtable = .{
+            .drawText = @ptrCast(&drawText),
+            .measureText = @ptrCast(&measureText),
+            .isKeyDown = @ptrCast(&isKeyDown),
+            .isKeyPressed = @ptrCast(&isKeyPressed),
+        } };
     }
 
     fn drawText(self: *Self, text: []const u8, posX: f32, posY: f32, height: f32, color: ray.Color) void {
@@ -37,6 +42,14 @@ const RaylibPlatform = struct {
         const w = ray.MeasureText(@ptrCast(text), h);
         return @floatFromInt(w);
     }
+
+    fn isKeyDown(_: *Self, key: i32) bool {
+        return ray.IsKeyDown(key);
+    }
+
+    fn isKeyPressed(_: *Self, key: i32) bool {
+        return ray.IsKeyPressed(key);
+    }
 };
 
 pub fn main() !void {
@@ -47,7 +60,6 @@ pub fn main() !void {
     ray.InitWindow(width, height, "SquareWars!");
 
     defer ray.CloseWindow();
-
     var gpa = std.heap.GeneralPurposeAllocator(.{ .stack_trace_frames = 8 }){};
     const allocator = gpa.allocator();
     defer {
@@ -66,6 +78,7 @@ pub fn main() !void {
         ray.ClearBackground(ray.BLACK);
         const dt = ray.GetFrameTime();
         game.update(dt);
+        ray.DrawRectangle(10, 10, 10, 10, ray.WHITE);
 
         //const dynamic = try std.fmt.allocPrintZ(allocator, "running since {d} seconds", .{seconds});
         //defer allocator.free(dynamic);

@@ -10,8 +10,9 @@ const State = enum {
 state: State = State.title,
 platform: Platform,
 score: i32 = 0.0,
-time_elapsed_sec: f32 = 0.0,
+time_elapsed: f32 = 0.0,
 timer_1hz: f32 = 0.0,
+delay_countdown: f32 = 2.0,
 
 pub fn init(platform: Platform) Game {
     return Game{
@@ -24,6 +25,17 @@ pub fn is_signal(self: *Game) bool {
         return true;
     } else {
         return false;
+    }
+}
+
+fn is_input_allowed(self: *Game) bool {
+    return self.delay_countdown <= 0.0;
+}
+
+fn goto_state(self: *Game, state: State) void {
+    if (self.state != state) {
+        self.state = state;
+        self.delay_countdown = 1.0;
     }
 }
 
@@ -45,6 +57,12 @@ fn update_title(self: *Game, _: f32) void {
         const s = "---- Press Space ----";
         platform.drawText(s, center_x - platform.measureText(s, height / 2.0) / 2.0, center_y + height + height / 2.0, height / 2.0, Platform.Color{});
     }
+
+    if (self.is_input_allowed()) {
+        if (platform.isKeyPressed(Platform.Key.space)) {
+            self.state = State.gaming;
+        }
+    }
 }
 
 fn update_gaming(_: *Game, _: f32) void {}
@@ -59,9 +77,13 @@ pub fn update(self: *Game, dt: f32) void {
         },
     }
 
-    self.time_elapsed_sec += dt;
+    self.time_elapsed += dt;
     self.timer_1hz += dt;
     if (self.timer_1hz > 1.0) {
         self.timer_1hz = 0.0;
+    }
+    self.delay_countdown -= dt;
+    if (self.delay_countdown < 0.0) {
+        self.delay_countdown = 0.0;
     }
 }
