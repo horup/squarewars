@@ -1,5 +1,5 @@
 const std = @import("std");
-const Platform = @import("platform.zig");
+const Platform = @import("Platform.zig");
 const Thing = @import("Thing.zig");
 const arena = @import("arena.zig");
 const Arena = arena.Arena;
@@ -57,7 +57,9 @@ fn set_state(self: *Game, state: State) void {
 
         const player = self.things.insert(.{
             .pos = .{ .x = 64.0, .y = Game.HEIGHT / 2.0 },
+            .update = &Thing.playerUpdate,
         });
+
         self.player = player;
     }
 }
@@ -96,6 +98,9 @@ fn update_gaming(self: *Game, dt: f32) void {
         const y = thing.pos.y;
         const size = thing.size;
         const color = .{ .g = 255 };
+        if (thing.update) |f| {
+            f(@ptrCast(self), thing);
+        }
         platform.drawSquare(x, y, size, color);
     }
 }
