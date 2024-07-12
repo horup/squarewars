@@ -79,6 +79,7 @@ pub fn main() !void {
 
     var platform = RaylibPlatform.init(allocator);
     var game = Game.init(platform.platform());
+    defer game.deinit();
 
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();

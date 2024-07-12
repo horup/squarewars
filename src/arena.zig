@@ -1,12 +1,11 @@
 const std = @import("std");
-
+pub const Key = struct { index: u32, generation: u32 };
 pub fn Arena(comptime T: type) type {
-    const Key = struct { index: u32, generation: u32 };
     const Cell = struct { key: Key, value: T, in_use: bool };
     const ArenaIterator = struct {
         arena: *Arena(T),
         index: usize,
-        fn next(self: *@This()) ?*T {
+        pub fn next(self: *@This()) ?*T {
             while (self.index < self.arena.cells.items.len) {
                 defer self.index += 1;
                 if (self.arena.cells.items[self.index].in_use) {
