@@ -1,5 +1,5 @@
 const std = @import("std");
-const Platform = @import("Platform.zig");
+const Platform = @import("Platform.zig").Platform;
 const Thing = @import("Thing.zig");
 const arena = @import("arena.zig");
 const Arena = arena.Arena;
