@@ -52,11 +52,12 @@ const RaylibPlatform = struct {
         return ray.IsKeyPressed(key);
     }
 
-    fn drawSquare(_: *Self, posX: f32, posY: f32, size: f32, color: ray.Color) void {
+    fn drawSquare(self: *Self, posX: f32, posY: f32, size: f32, color: ray.Color) void {
+        const c = self.scale();
         const x: i32 = @intFromFloat(posX);
         const y: i32 = @intFromFloat(posY);
         const s: i32 = @intFromFloat(size);
-        ray.DrawRectangle(x, y, s, s, color);
+        ray.DrawRectangle(x * c, y * c, s * c, s * c, color);
     }
 };
 
