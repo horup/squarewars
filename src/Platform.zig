@@ -21,6 +21,7 @@ vtable: struct {
     isKeyPressed: *const fn (ptr: *anyopaque, key: Key) bool,
     drawText: *const fn (ptr: *anyopaque, text: []const u8, posX: f32, posY: f32, height: f32, color: Color) void,
     measureText: *const fn (ptr: *anyopaque, text: []const u8, height: f32) f32,
+    drawSquare: *const fn (ptr: *anyopaque, posX: f32, posY: f32, size: f32, color: Color) void,
 },
 allocator: std.mem.Allocator,
 
@@ -38,4 +39,8 @@ pub fn isKeyDown(self: *Self, key: Key) bool {
 
 pub fn isKeyPressed(self: *Self, key: Key) bool {
     return self.vtable.isKeyPressed(self.ptr, key);
+}
+
+pub fn drawSquare(self: *Self, posX: f32, posY: f32, size: f32, color: Color) void {
+    self.vtable.drawSquare(self.ptr, posX, posY, size, color);
 }

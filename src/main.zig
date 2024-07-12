@@ -26,6 +26,7 @@ const RaylibPlatform = struct {
             .measureText = @ptrCast(&measureText),
             .isKeyDown = @ptrCast(&isKeyDown),
             .isKeyPressed = @ptrCast(&isKeyPressed),
+            .drawSquare = @ptrCast(&drawSquare),
         } };
     }
 
@@ -49,6 +50,13 @@ const RaylibPlatform = struct {
 
     fn isKeyPressed(_: *Self, key: i32) bool {
         return ray.IsKeyPressed(key);
+    }
+
+    fn drawSquare(_: *Self, posX: f32, posY: f32, size: f32, color: ray.Color) void {
+        const x: i32 = @intFromFloat(posX);
+        const y: i32 = @intFromFloat(posY);
+        const s: i32 = @intFromFloat(size);
+        ray.DrawRectangle(x, y, s, s, color);
     }
 };
 
