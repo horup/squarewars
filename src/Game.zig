@@ -1,7 +1,7 @@
 const std = @import("std");
 const Platform = @import("platform.zig");
 const Thing = @import("Thing.zig");
-const Arena = @import("Arena.zig");
+const Arena = @import("arena.zig").Arena;
 const Game = @This();
 const WIDTH: f32 = 320.0;
 const HEIGHT: f32 = 240.0;
