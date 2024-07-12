@@ -1,10 +1,10 @@
+const Game = @This();
 const std = @import("std");
-const Platform = @import("Platform.zig").Platform;
+const Platform = @import("platform.zig").Platform;
 const Thing = @import("Thing.zig");
 const arena = @import("arena.zig");
 const Arena = arena.Arena;
 const Key = arena.Key;
-const Game = @This();
 const WIDTH: f32 = 320.0;
 const HEIGHT: f32 = 240.0;
 const State = enum {
