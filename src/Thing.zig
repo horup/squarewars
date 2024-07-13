@@ -19,3 +19,5 @@ pub fn playerUpdate(game: *Game, me: *Thing, dt: f32) void {
     v = v.mul_scalar(speed).mul_scalar(dt);
     me.pos = me.pos.add(v);
 }
+
+pub fn enemyUpdate(_: *Game, _: *Thing, _: f32) void {}

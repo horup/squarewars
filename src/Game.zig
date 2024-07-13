@@ -19,6 +19,8 @@ player: ?Key = null,
 game_time: f32 = 0.0,
 timer_1hz: f32 = 0.0,
 delay_countdown: f32 = 0.5,
+spawn_countdown: f32 = 0.0,
+xosh: std.rand.DefaultPrng = std.rand.DefaultPrng.init(0),
 
 pub fn init(platform: Platform) Game {
     return Game{
@@ -54,6 +56,7 @@ fn set_state(self: *Game, state: State) void {
         self.score = 0;
         self.things.clear();
         self.game_time = 0.0;
+        self.spawn_countdown = 0;
 
         const player = self.things.insert(.{
             .pos = .{ .x = 64.0, .y = Game.HEIGHT / 2.0 },
@@ -102,6 +105,18 @@ fn update_gaming(self: *Game, dt: f32) void {
             f(@ptrCast(self), thing, dt);
         }
         platform.drawSquare(x, y, size, color);
+    }
+
+    self.spawn_countdown -= dt;
+    if (self.spawn_countdown <= 0.0) {
+        const rand = self.xosh.random();
+        const margin = 16.0;
+        const x = Game.WIDTH - margin;
+        const y = rand.float(f32) * (Game.HEIGHT - margin * 2.0) + margin;
+        _ = self.things.insert(.{
+            .pos = .{ .x = x, .y = y },
+        });
+        self.spawn_countdown = 1.0;
     }
 }
 
