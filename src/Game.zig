@@ -115,6 +115,7 @@ fn update_gaming(self: *Game, dt: f32) void {
         const y = rand.float(f32) * (Game.HEIGHT - margin * 2.0) + margin;
         _ = self.things.insert(.{
             .pos = .{ .x = x, .y = y },
+            .update = Thing.enemyUpdate,
         });
         self.spawn_countdown = 1.0;
     }

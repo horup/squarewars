@@ -20,4 +20,6 @@ pub fn playerUpdate(game: *Game, me: *Thing, dt: f32) void {
     me.pos = me.pos.add(v);
 }
 
-pub fn enemyUpdate(_: *Game, _: *Thing, _: f32) void {}
+pub fn enemyUpdate(_: *Game, me: *Thing, dt: f32) void {
+    me.pos.x -= dt;
+}
