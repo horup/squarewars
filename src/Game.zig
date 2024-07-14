@@ -166,20 +166,33 @@ fn update_gaming(self: *Game, dt: f32) void {
     self.process_contacts();
     self.draw(dt);
 
-    self.spawn_countdown -= dt;
-    if (self.spawn_countdown <= 0.0) {
-        const margin = 16.0;
-        const x = Game.WIDTH + margin;
-        const y = self.spawn_pos * (Game.HEIGHT - margin * 2.0) + margin;
-        _ = Thing.spawnEnemy(self, .{ .x = x, .y = y });
-        self.spawn_countdown = 1.0;
-        self.spawn_pos += 0.1;
-        if (self.spawn_pos > 1.0) {
-            self.spawn_pos = 0.0;
+    if (self.game_time > 5.0) {
+        // spawn enemeis
+        self.spawn_countdown -= dt;
+        if (self.spawn_countdown <= 0.0) {
+            const margin = 16.0;
+            const x = Game.WIDTH + margin;
+            const y = self.spawn_pos * (Game.HEIGHT - margin * 2.0) + margin;
+            _ = Thing.spawnEnemy(self, .{ .x = x, .y = y });
+            self.spawn_countdown = 1.0;
+            self.spawn_pos += 0.1;
+            if (self.spawn_pos > 1.0) {
+                self.spawn_pos = 0.0;
+            }
+        }
+    } else {
+        // show instructions
+        const center_x = Game.WIDTH / 2.0;
+        const text_y = 64.0;
+        const height = 16.0;
+        {
+            const s = "Fly up and down using 'W' and 'S'\n\nShoot using 'Space'\n\nSurvive as long as you can!";
+            platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, text_y - height, height, Platform.Color{});
         }
     }
 
     if (self.player == null) {
+        // play is no more, allow respawning after some time
         self.respawn_countdown -= dt;
         if (self.respawn_countdown <= 1.0) {
             const center_x = Game.WIDTH / 2.0;
@@ -206,6 +219,7 @@ fn update_gaming(self: *Game, dt: f32) void {
             }
         }
     } else {
+        // progress game time while alive
         self.game_time += dt;
     }
 }
