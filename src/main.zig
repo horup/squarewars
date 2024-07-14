@@ -87,8 +87,5 @@ pub fn main() !void {
         ray.ClearBackground(ray.BLACK);
         const dt = ray.GetFrameTime();
         game.update(dt);
-
-        //const dynamic = try std.fmt.allocPrintZ(allocator, "running since {d} seconds", .{seconds});
-        //defer allocator.free(dynamic);
     }
 }
