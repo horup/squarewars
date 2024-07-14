@@ -57,18 +57,11 @@ fn set_state(self: *Game, state: State) void {
     }
 
     if (state == State.gaming) {
-        // reset game
         self.score = 0;
         self.things.clear();
         self.game_time = 0.0;
         self.spawn_countdown = 0;
-
-        const player = self.things.insert(.{
-            .pos = .{ .x = 64.0, .y = Game.HEIGHT / 2.0 },
-            .update = &Thing.playerUpdate,
-            .contact = &Thing.playerContact,
-        });
-
+        const player = Thing.spawnPlayer(self, .{ .x = 64.0, .y = Game.HEIGHT / 2.0 });
         self.player = player;
     }
 }
@@ -176,13 +169,9 @@ fn update_gaming(self: *Game, dt: f32) void {
     self.spawn_countdown -= dt;
     if (self.spawn_countdown <= 0.0) {
         const margin = 16.0;
-        const x = Game.WIDTH - margin;
+        const x = Game.WIDTH + margin;
         const y = self.spawn_pos * (Game.HEIGHT - margin * 2.0) + margin;
-        _ = self.things.insert(.{
-            .pos = .{ .x = x, .y = y },
-            .update = Thing.enemyUpdate,
-            .contact = Thing.enemyContact,
-        });
+        _ = Thing.spawnEnemy(self, .{ .x = x, .y = y });
         self.spawn_countdown = 1.0;
         self.spawn_pos += 0.1;
         if (self.spawn_pos > 1.0) {

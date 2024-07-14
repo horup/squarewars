@@ -10,7 +10,25 @@ vel: Vec2 = .{},
 size: f32 = 16.0,
 solid: bool = true,
 update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
+post_update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
+
+pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
+    const player = game.things.insert(.{
+        .pos = pos,
+        .update = &Thing.playerUpdate,
+        .contact = &Thing.playerContact,
+    });
+    return player;
+}
+pub fn spawnEnemy(game: *Game, pos: Vec2) Key {
+    const enemy = game.things.insert(.{
+        .pos = pos,
+        .update = Thing.enemyUpdate,
+        .contact = Thing.enemyContact,
+    });
+    return enemy;
+}
 
 pub fn rect(self: *const Thing) Rect {
     return .{
@@ -61,6 +79,17 @@ pub fn debrisUpdate(game: *Game, me: Key, dt: f32) void {
     }
 }
 
+pub fn thingPostUpdate(game: *Game, me: Key, _: f32) void {
+    if (game.things.get(me)) |thing| {
+        const min, const max = .{ 16.0, Game.HEIGHT - 16.0 };
+        if (thing.pos.y < min) {
+            thing.pos.y = min;
+        } else if (thing.pos.y > max) {
+            thing.pos.y = max;
+        }
+    }
+}
+
 pub fn playerUpdate(game: *Game, me: Key, _: f32) void {
     const thing = game.things.get(me).?;
     var platform = game.platform;
@@ -78,7 +107,6 @@ pub fn playerUpdate(game: *Game, me: Key, _: f32) void {
 pub fn enemyUpdate(game: *Game, me: Key, _: f32) void {
     const thing = game.things.get(me).?;
     thing.vel.x = -160.0;
-
     if (thing.pos.x < 0.0) {
         game.things.delete(me);
     }
