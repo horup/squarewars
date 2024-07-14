@@ -98,13 +98,13 @@ fn update_gaming(self: *Game, dt: f32) void {
     self.game_time += dt;
     var things = self.things.iter();
     while (things.next()) |kv| {
-        _, const thing = kv;
+        const key, const thing = kv;
         const x = thing.pos.x;
         const y = thing.pos.y;
         const size = thing.size;
         const color = .{ .g = 255 };
         if (thing.update) |f| {
-            f(@ptrCast(self), thing, dt);
+            f(@ptrCast(self), key, dt);
         }
         platform.drawSquare(x, y, size, color);
     }
