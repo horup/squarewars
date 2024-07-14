@@ -2,7 +2,7 @@ const std = @import("std");
 pub const Key = struct { index: u32, generation: u32 };
 pub fn Arena(comptime T: type) type {
     const Cell = struct { key: Key, value: T, in_use: bool };
-    const KeyValue = struct { key: Key, value: *T };
+    const KeyValue = struct { Key, *T };
 
     const ArenaIterator = struct {
         arena: *Arena(T),
@@ -12,8 +12,8 @@ pub fn Arena(comptime T: type) type {
                 defer self.index += 1;
                 if (self.arena.cells.items[self.index].in_use) {
                     return .{
-                        .key = self.arena.cells.items[self.index].key,
-                        .value = &self.arena.cells.items[self.index].value,
+                        self.arena.cells.items[self.index].key,
+                        &self.arena.cells.items[self.index].value,
                     };
                 }
             }

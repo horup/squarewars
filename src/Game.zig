@@ -98,7 +98,7 @@ fn update_gaming(self: *Game, dt: f32) void {
     self.game_time += dt;
     var things = self.things.iter();
     while (things.next()) |kv| {
-        const thing = kv.value;
+        _, const thing = kv;
         const x = thing.pos.x;
         const y = thing.pos.y;
         const size = thing.size;
