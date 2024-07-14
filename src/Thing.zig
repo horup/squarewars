@@ -1,3 +1,4 @@
+const std = @import("std");
 const Rect = @import("Rect.zig");
 const Vec2 = @import("Vec2.zig");
 const Game = @import("Game.zig");
@@ -7,6 +8,7 @@ const Platform = @import("Platform.zig");
 pos: Vec2 = .{},
 vel: Vec2 = .{},
 size: f32 = 16.0,
+solid: bool = true,
 update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
 
@@ -19,12 +21,44 @@ pub fn rect(self: *const Thing) Rect {
     };
 }
 
-pub fn playerContact(game: *Game, me: Key, _: Key) void {
+pub fn playerContact(game: *Game, me: Key, other: Key) void {
+    thingContact(game, me, other);
+}
+
+pub fn enemyContact(game: *Game, me: Key, other: Key) void {
+    thingContact(game, me, other);
+}
+
+pub fn thingContact(game: *Game, me: Key, _: Key) void {
+    var pos: Vec2 = .{};
+    if (game.things.get(me)) |thing| {
+        pos = thing.pos;
+    }
+    const l = 16;
+    for (0..l) |i| {
+        const f: f32 = @floatFromInt(i);
+        const a = f / l * std.math.pi * 2.0;
+        const v: Vec2 = .{ .x = std.math.cos(a), .y = std.math.sin(a) };
+        _ = game.things.insert(.{
+            .solid = false,
+            .size = 8.0,
+            .pos = pos,
+            .vel = v.mul_scalar(60.0),
+            .update = debrisUpdate,
+        });
+    }
+
     game.things.delete(me);
 }
 
-pub fn enemyContact(game: *Game, me: Key, _: Key) void {
-    game.things.delete(me);
+pub fn debrisUpdate(game: *Game, me: Key, dt: f32) void {
+    if (game.things.get(me)) |thing| {
+        thing.size -= dt * 10.0;
+        if (thing.size <= 0.0) {
+            thing.size = 0.0;
+            game.things.delete(me);
+        }
+    }
 }
 
 pub fn playerUpdate(game: *Game, me: Key, _: f32) void {

@@ -106,15 +106,23 @@ fn physics(self: *Game, dt: f32) void {
         const key, const thing = kv;
         const new_pos = thing.pos.add(thing.vel.mul_scalar(dt));
         thing.pos = new_pos;
+        if (!thing.solid) {
+            continue;
+        }
+
         var things2 = self.things.iter();
         while (things2.next()) |kv2| {
             const key2, const thing2 = kv2;
-            if (key.equals(key2) == false) {
-                const r1 = thing.rect();
-                const r2 = thing2.rect();
-                if (r1.intersects(r2)) {
-                    self.contacts.append(.{ key, key2 }) catch unreachable;
-                }
+            if (key.equals(key2)) {
+                continue;
+            }
+            if (!thing2.solid) {
+                continue;
+            }
+            const r1 = thing.rect();
+            const r2 = thing2.rect();
+            if (r1.intersects(r2)) {
+                self.contacts.append(.{ key, key2 }) catch unreachable;
             }
         }
     }
