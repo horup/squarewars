@@ -53,11 +53,11 @@ const RaylibPlatform = struct {
     }
 
     fn drawSquare(self: *Self, posX: f32, posY: f32, size: f32, color: ray.Color) void {
-        const c = self.scale();
-        const x: i32 = @intFromFloat(posX);
-        const y: i32 = @intFromFloat(posY);
-        const s: i32 = @intFromFloat(size);
-        ray.DrawRectangle(x * c, y * c, s * c, s * c, color);
+        const c: f32 = @floatFromInt(self.scale());
+        const x: i32 = @intFromFloat(posX * c);
+        const y: i32 = @intFromFloat(posY * c);
+        const s: i32 = @intFromFloat(size * c);
+        ray.DrawRectangle(x, y, s, s, color);
     }
 };
 

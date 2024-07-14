@@ -141,8 +141,8 @@ fn draw(self: *Game, _: f32) void {
     var things = self.things.iter();
     while (things.next()) |kv| {
         _, const thing = kv;
-        const x = thing.pos.x;
-        const y = thing.pos.y;
+        const x = thing.pos.x - thing.size / 2.0;
+        const y = thing.pos.y - thing.size / 2.0;
         const size = thing.size;
         const color = .{ .g = 255 };
         platform.drawSquare(x, y, size, color);
