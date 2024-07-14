@@ -23,6 +23,10 @@ pub fn playerContact(game: *Game, me: Key, _: Key) void {
     game.things.delete(me);
 }
 
+pub fn enemyContact(game: *Game, me: Key, _: Key) void {
+    game.things.delete(me);
+}
+
 pub fn playerUpdate(game: *Game, me: Key, _: f32) void {
     const thing = game.things.get(me).?;
     var platform = game.platform;

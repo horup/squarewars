@@ -173,6 +173,7 @@ fn update_gaming(self: *Game, dt: f32) void {
         _ = self.things.insert(.{
             .pos = .{ .x = x, .y = y },
             .update = Thing.enemyUpdate,
+            .contact = Thing.enemyContact,
         });
         self.spawn_countdown = 1.0;
         self.spawn_pos += 0.1;
