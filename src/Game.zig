@@ -24,6 +24,7 @@ delay_countdown: f32 = 0.5,
 spawn_countdown: f32 = 0.0,
 xosh: std.rand.DefaultPrng = std.rand.DefaultPrng.init(0),
 spawn_pos: f32 = 0.0,
+respawn_countdown: f32 = 2.0,
 
 pub fn init(platform: Platform) Game {
     return Game{
@@ -51,12 +52,10 @@ fn is_input_allowed(self: *Game) bool {
 }
 
 fn set_state(self: *Game, state: State) void {
-    if (self.state != state) {
-        self.state = state;
-        self.delay_countdown = 1.0;
-    }
-
+    self.delay_countdown = 1.0;
+    self.state = state;
     if (state == State.gaming) {
+        self.respawn_countdown = 2.0;
         self.score = 0;
         self.things.clear();
         self.game_time = 0.0;
@@ -161,6 +160,7 @@ fn update_things(self: *Game, dt: f32) void {
 }
 
 fn update_gaming(self: *Game, dt: f32) void {
+    var platform = self.platform;
     self.update_things(dt);
     self.physics(dt);
     self.process_contacts();
@@ -179,7 +179,35 @@ fn update_gaming(self: *Game, dt: f32) void {
         }
     }
 
-    self.game_time += dt;
+    if (self.player == null) {
+        self.respawn_countdown -= dt;
+        if (self.respawn_countdown <= 1.0) {
+            const center_x = Game.WIDTH / 2.0;
+            const center_y = Game.HEIGHT / 2.0;
+            const height = 32.0;
+            {
+                const s = "YOU WERE";
+                platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, center_y - height, height, Platform.Color{});
+            }
+            {
+                const s = "DESTROYED!";
+                platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, center_y, height, Platform.Color{});
+            }
+            if (self.respawn_countdown <= 0.0) {
+                if (self.is_signal()) {
+                    const s = "---- Press Space ----";
+                    platform.drawText(s, center_x - platform.measureText(s, height / 2.0) / 2.0, center_y + height + height / 2.0, height / 2.0, Platform.Color{});
+                }
+                if (self.is_input_allowed()) {
+                    if (platform.isKeyPressed(Platform.Key.space)) {
+                        set_state(self, State.gaming);
+                    }
+                }
+            }
+        }
+    } else {
+        self.game_time += dt;
+    }
 }
 
 pub fn update(self: *Game, dt: f32) void {

@@ -41,6 +41,7 @@ pub fn rect(self: *const Thing) Rect {
 
 pub fn playerContact(game: *Game, me: Key, other: Key) void {
     thingContact(game, me, other);
+    game.player = null;
 }
 
 pub fn enemyContact(game: *Game, me: Key, other: Key) void {
