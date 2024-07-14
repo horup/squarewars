@@ -21,5 +21,6 @@ pub fn playerUpdate(game: *Game, me: *Thing, dt: f32) void {
 }
 
 pub fn enemyUpdate(_: *Game, me: *Thing, dt: f32) void {
-    me.pos.x -= dt;
+    me.pos.x -= dt * Game.WIDTH / 2.0;
+    if (me.pos.x < 0.0) {}
 }

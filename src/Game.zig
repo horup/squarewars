@@ -5,8 +5,8 @@ const Thing = @import("Thing.zig");
 const arena = @import("arena.zig");
 const Arena = arena.Arena;
 const Key = arena.Key;
-const WIDTH: f32 = 320.0;
-const HEIGHT: f32 = 240.0;
+pub const WIDTH: f32 = 320.0;
+pub const HEIGHT: f32 = 240.0;
 const State = enum {
     title,
     gaming,
@@ -21,6 +21,7 @@ timer_1hz: f32 = 0.0,
 delay_countdown: f32 = 0.5,
 spawn_countdown: f32 = 0.0,
 xosh: std.rand.DefaultPrng = std.rand.DefaultPrng.init(0),
+spawn_pos: f32 = 0.0,
 
 pub fn init(platform: Platform) Game {
     return Game{
@@ -109,15 +110,18 @@ fn update_gaming(self: *Game, dt: f32) void {
 
     self.spawn_countdown -= dt;
     if (self.spawn_countdown <= 0.0) {
-        const rand = self.xosh.random();
         const margin = 16.0;
         const x = Game.WIDTH - margin;
-        const y = rand.float(f32) * (Game.HEIGHT - margin * 2.0) + margin;
+        const y = self.spawn_pos * (Game.HEIGHT - margin * 2.0) + margin;
         _ = self.things.insert(.{
             .pos = .{ .x = x, .y = y },
             .update = Thing.enemyUpdate,
         });
         self.spawn_countdown = 1.0;
+        self.spawn_pos += 0.1;
+        if (self.spawn_pos > 1.0) {
+            self.spawn_pos = 0.0;
+        }
     }
 }
 
