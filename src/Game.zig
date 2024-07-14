@@ -66,6 +66,7 @@ fn set_state(self: *Game, state: State) void {
         const player = self.things.insert(.{
             .pos = .{ .x = 64.0, .y = Game.HEIGHT / 2.0 },
             .update = &Thing.playerUpdate,
+            .contact = &Thing.playerContact,
         });
 
         self.player = player;
@@ -119,6 +120,22 @@ fn physics(self: *Game, dt: f32) void {
     }
 }
 
+fn process_contacts(self: *Game) void {
+    for (self.contacts.items, 0..self.contacts.items.len) |contact, _| {
+        const key1, const key2 = contact;
+        if (self.things.get(key1)) |thing| {
+            if (thing.contact) |contact_fn| {
+                contact_fn(self, key1, key2);
+            }
+        }
+        if (self.things.get(key2)) |thing| {
+            if (thing.contact) |contact_fn| {
+                contact_fn(self, key2, key1);
+            }
+        }
+    }
+}
+
 fn draw(self: *Game, _: f32) void {
     var platform = self.platform;
     var things = self.things.iter();
@@ -137,7 +154,7 @@ fn update_things(self: *Game, dt: f32) void {
     while (things.next()) |kv| {
         const key, const thing = kv;
         if (thing.update) |f| {
-            f(@ptrCast(self), key, dt);
+            f(self, key, dt);
         }
     }
 }
@@ -145,6 +162,7 @@ fn update_things(self: *Game, dt: f32) void {
 fn update_gaming(self: *Game, dt: f32) void {
     self.update_things(dt);
     self.physics(dt);
+    self.process_contacts();
     self.draw(dt);
 
     self.spawn_countdown -= dt;

@@ -8,6 +8,7 @@ pos: Vec2 = .{},
 vel: Vec2 = .{},
 size: f32 = 16.0,
 update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
+contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
 
 pub fn rect(self: *const Thing) Rect {
     return .{
@@ -16,6 +17,10 @@ pub fn rect(self: *const Thing) Rect {
         .w = self.size,
         .h = self.size,
     };
+}
+
+pub fn playerContact(game: *Game, me: Key, _: Key) void {
+    game.things.delete(me);
 }
 
 pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {

@@ -1,6 +1,6 @@
 const std = @import("std");
 const Platform = @import("Platform.zig");
-const Game = @import("game.zig");
+const Game = @import("Game.zig");
 const ray = @cImport({
     @cInclude("raylib.h");
     @cInclude("raymath.h");
