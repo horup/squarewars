@@ -23,7 +23,7 @@ pub fn playerContact(game: *Game, me: Key, _: Key) void {
     game.things.delete(me);
 }
 
-pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
+pub fn playerUpdate(game: *Game, me: Key, _: f32) void {
     const thing = game.things.get(me).?;
     var platform = game.platform;
     var v: Vec2 = .{};
@@ -32,16 +32,16 @@ pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
     } else if (platform.isKeyDown(Platform.Key.s)) {
         v.y = 1.0;
     }
-    const speed = 240.0;
-    v = v.mul_scalar(speed).mul_scalar(dt);
-    thing.pos = thing.pos.add(v);
+    const speed = 200.0;
+    v = v.mul_scalar(speed);
+    thing.vel = v;
 }
 
-pub fn enemyUpdate(game: *Game, me: Key, dt: f32) void {
+pub fn enemyUpdate(game: *Game, me: Key, _: f32) void {
     const thing = game.things.get(me).?;
-    thing.pos.x -= dt * Game.WIDTH / 2.0;
+    thing.vel.x = -160.0;
 
     if (thing.pos.x < 0.0) {
-        // despawn
+        game.things.delete(me);
     }
 }
