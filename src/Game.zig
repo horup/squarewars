@@ -5,12 +5,14 @@ const Thing = @import("Thing.zig");
 const arena = @import("arena.zig");
 const Arena = arena.Arena;
 const Key = arena.Key;
+const Contact = struct { Key, Key };
 pub const WIDTH: f32 = 320.0;
 pub const HEIGHT: f32 = 240.0;
 const State = enum {
     title,
     gaming,
 };
+contacts: std.ArrayList(Contact),
 things: Arena(Thing),
 state: State = State.title,
 platform: Platform,
@@ -25,6 +27,7 @@ spawn_pos: f32 = 0.0,
 
 pub fn init(platform: Platform) Game {
     return Game{
+        .contacts = std.ArrayList(Contact).init(platform.allocator),
         .platform = platform,
         .things = Arena(Thing).init(platform.allocator),
     };
@@ -32,6 +35,7 @@ pub fn init(platform: Platform) Game {
 
 pub fn deinit(self: *Game) void {
     self.things.deinit();
+    self.contacts.deinit();
 }
 
 pub fn is_signal(self: *Game) bool {
@@ -93,21 +97,55 @@ fn update_title(self: *Game, _: f32) void {
     }
 }
 
-fn update_gaming(self: *Game, dt: f32) void {
-    var platform = self.platform;
-    self.game_time += dt;
+fn physics(self: *Game, dt: f32) void {
+    self.contacts.clearRetainingCapacity();
     var things = self.things.iter();
+
     while (things.next()) |kv| {
         const key, const thing = kv;
+        const new_pos = thing.pos.add(thing.vel.mul_scalar(dt));
+        thing.pos = new_pos;
+        var things2 = self.things.iter();
+        while (things2.next()) |kv2| {
+            const key2, const thing2 = kv2;
+            if (key.equals(key2) == false) {
+                const r1 = thing.rect();
+                const r2 = thing2.rect();
+                if (r1.intersects(r2)) {
+                    self.contacts.append(.{ key, key2 }) catch unreachable;
+                }
+            }
+        }
+    }
+}
+
+fn draw(self: *Game, _: f32) void {
+    var platform = self.platform;
+    var things = self.things.iter();
+    while (things.next()) |kv| {
+        _, const thing = kv;
         const x = thing.pos.x;
         const y = thing.pos.y;
         const size = thing.size;
         const color = .{ .g = 255 };
+        platform.drawSquare(x, y, size, color);
+    }
+}
+
+fn update_things(self: *Game, dt: f32) void {
+    var things = self.things.iter();
+    while (things.next()) |kv| {
+        const key, const thing = kv;
         if (thing.update) |f| {
             f(@ptrCast(self), key, dt);
         }
-        platform.drawSquare(x, y, size, color);
     }
+}
+
+fn update_gaming(self: *Game, dt: f32) void {
+    self.update_things(dt);
+    self.physics(dt);
+    self.draw(dt);
 
     self.spawn_countdown -= dt;
     if (self.spawn_countdown <= 0.0) {
@@ -124,6 +162,8 @@ fn update_gaming(self: *Game, dt: f32) void {
             self.spawn_pos = 0.0;
         }
     }
+
+    self.game_time += dt;
 }
 
 pub fn update(self: *Game, dt: f32) void {

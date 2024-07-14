@@ -1,3 +1,4 @@
+const Rect = @import("Rect.zig");
 const Vec2 = @import("Vec2.zig");
 const Game = @import("Game.zig");
 const Thing = @This();
@@ -7,6 +8,15 @@ pos: Vec2 = .{},
 vel: Vec2 = .{},
 size: f32 = 16.0,
 update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
+
+pub fn rect(self: *const Thing) Rect {
+    return .{
+        .x = self.pos.x - self.size / 2.0,
+        .y = self.pos.y - self.size / 2.0,
+        .w = self.size,
+        .h = self.size,
+    };
+}
 
 pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
     const thing = game.things.get(me).?;

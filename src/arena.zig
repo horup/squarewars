@@ -1,5 +1,11 @@
 const std = @import("std");
-pub const Key = struct { index: u32, generation: u32 };
+pub const Key = struct {
+    index: u32,
+    generation: u32,
+    pub fn equals(self: Key, other: Key) bool {
+        return self.index == other.index and self.generation == other.generation;
+    }
+};
 pub fn Arena(comptime T: type) type {
     const Cell = struct { key: Key, value: T, in_use: bool };
     const KeyValue = struct { Key, *T };
