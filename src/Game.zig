@@ -136,6 +136,20 @@ fn process_contacts(self: *Game) void {
     }
 }
 
+fn draw_star(g: *Game, x: f32, y: f32) void {
+    const outer_color = .{ .a = 128 };
+    const inner_color = .{ .a = 255 };
+    g.platform.drawSquare(x, y, 1.0, inner_color);
+    g.platform.drawSquare(x, y + 1.0, 1.0, outer_color);
+    g.platform.drawSquare(x + 1.0, y, 1.0, outer_color);
+    g.platform.drawSquare(x, y - 1.0, 1.0, outer_color);
+    g.platform.drawSquare(x - 1.0, y, 1.0, outer_color);
+}
+
+fn draw_stars(g: *Game, _: f32) void {
+    g.draw_star(16.0, 16.0);
+}
+
 fn draw(self: *Game, _: f32) void {
     var platform = self.platform;
     var things = self.things.iter();
@@ -225,6 +239,7 @@ fn update_gaming(self: *Game, dt: f32) void {
 }
 
 pub fn update(self: *Game, dt: f32) void {
+    self.draw_stars(dt);
     switch (self.state) {
         State.title => {
             self.update_title(dt);
