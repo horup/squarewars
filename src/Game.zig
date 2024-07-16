@@ -147,7 +147,19 @@ fn draw_star(g: *Game, x: f32, y: f32) void {
 }
 
 fn draw_stars(g: *Game, _: f32) void {
-    g.draw_star(16.0, 16.0);
+    var xosh = std.rand.DefaultPrng.init(0);
+    const random = &xosh.random();
+    for (0..6) |row| {
+        for (0..6) |col| {
+            const speed = 128.0;
+            const col_f: f32 = @floatFromInt(col);
+            const row_f: f32 = @floatFromInt(row);
+            var x: f32 = col_f / 6.0 * Game.WIDTH - g.game_time * speed + random.float(f32) * 32.0;
+            x = @mod(x, Game.WIDTH);
+            const y: f32 = row_f / 6.0 * Game.HEIGHT + random.float(f32) * 32.0 + 8.0;
+            g.draw_star(x, y);
+        }
+    }
 }
 
 fn draw(self: *Game, _: f32) void {
