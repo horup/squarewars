@@ -1,5 +1,6 @@
 const Game = @This();
 const std = @import("std");
+const Vec2 = @import("Vec2.zig");
 const Platform = @import("Platform.zig");
 const Thing = @import("Thing.zig");
 const arena = @import("arena.zig");
