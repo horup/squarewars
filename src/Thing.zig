@@ -104,18 +104,18 @@ fn thingUpdate(game: *Game, me: Key, dt: f32) void {
         if (thing.gun_cooldown < 0.0) {
             thing.gun_cooldown = 0.0;
         }
-
-        if (thing.pos.x < 0.0 or thing.pos.x > Game.WIDTH) {
+        const margin = 128.0;
+        if (thing.pos.x < -margin or thing.pos.x > Game.WIDTH + margin) {
             game.things.delete(me);
             return;
         }
 
         if (thing.gun_cooldown == 0.0 and thing.trigger == true) {
-            thing.gun_cooldown = 0.2;
+            thing.gun_cooldown = 0.33;
             _ = game.things.insert(.{
                 .pos = thing.pos,
-                .vel = .{ .x = 128.0 },
-                .size = 8.0,
+                .vel = .{ .x = 200.0 },
+                .size = 4.0,
                 .ignore_contact = me,
                 .update = thingUpdate,
                 .contact = projectileContact,

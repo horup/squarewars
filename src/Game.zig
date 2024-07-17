@@ -60,7 +60,7 @@ fn set_state(self: *Game, state: State) void {
         self.things.clear();
         self.game_time = 0.0;
         self.spawn_countdown = 0;
-        const player = Thing.spawnPlayer(self, .{ .x = 64.0, .y = Game.HEIGHT / 2.0 });
+        const player = Thing.spawnPlayer(self, .{ .x = 32.0, .y = Game.HEIGHT / 2.0 });
         self.player = player;
     }
 }
