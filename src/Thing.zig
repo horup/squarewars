@@ -12,6 +12,7 @@ solid: bool = true,
 update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 post_update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
+ignore_contact: ?Key = null,
 
 pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
     const player = game.things.insert(.{
