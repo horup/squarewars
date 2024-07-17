@@ -13,6 +13,8 @@ update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 post_update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
 ignore_contact: ?Key = null,
+gun_cooldown: f32 = 0.0,
+trigger: bool = false,
 
 pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
     const player = game.things.insert(.{
@@ -92,7 +94,36 @@ pub fn thingPostUpdate(game: *Game, me: Key, _: f32) void {
     }
 }
 
-pub fn playerUpdate(game: *Game, me: Key, _: f32) void {
+fn projectileContact(game: *Game, me: Key, _: Key) void {
+    game.things.delete(me);
+}
+
+fn thingUpdate(game: *Game, me: Key, dt: f32) void {
+    if (game.things.get(me)) |thing| {
+        thing.gun_cooldown -= dt;
+        if (thing.gun_cooldown < dt) {
+            thing.gun_cooldown = 0.0;
+        }
+
+        if (thing.pos.x < 0.0 or thing.pos.x > Game.WIDTH) {
+            game.things.delete(me);
+            return;
+        }
+
+        if (thing.gun_cooldown == 0.0 and thing.trigger == true) {
+            _ = game.things.insert(.{
+                .pos = thing.pos,
+                .vel = .{ .x = 128.0 },
+                .size = 8.0,
+                .ignore_contact = me,
+                .update = thingUpdate,
+                .contact = projectileContact,
+            });
+        }
+    }
+}
+
+pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
     const thing = game.things.get(me).?;
     var platform = game.platform;
     var v: Vec2 = .{};
@@ -101,15 +132,18 @@ pub fn playerUpdate(game: *Game, me: Key, _: f32) void {
     } else if (platform.isKeyDown(Platform.Key.s)) {
         v.y = 1.0;
     }
+    thing.trigger = platform.isKeyPressed(Platform.Key.space);
     const speed = 200.0;
     v = v.mul_scalar(speed);
     thing.vel = v;
+    thingUpdate(game, me, dt);
 }
 
-pub fn enemyUpdate(game: *Game, me: Key, _: f32) void {
+pub fn enemyUpdate(game: *Game, me: Key, dt: f32) void {
     const thing = game.things.get(me).?;
     thing.vel.x = -160.0;
     if (thing.pos.x < 0.0) {
         game.things.delete(me);
     }
+    thingUpdate(game, me, dt);
 }
