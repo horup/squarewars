@@ -108,6 +108,16 @@ fn physics(self: *Game, dt: f32) void {
             if (key.equals(key2)) {
                 continue;
             }
+            if (thing.ignore_contact) |ignore1| {
+                if (key2.equals(ignore1)) {
+                    continue;
+                }
+            }
+            if (thing2.ignore_contact) |ignore2| {
+                if (key.equals(ignore2)) {
+                    continue;
+                }
+            }
             if (!thing2.solid) {
                 continue;
             }

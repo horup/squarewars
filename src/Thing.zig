@@ -101,7 +101,7 @@ fn projectileContact(game: *Game, me: Key, _: Key) void {
 fn thingUpdate(game: *Game, me: Key, dt: f32) void {
     if (game.things.get(me)) |thing| {
         thing.gun_cooldown -= dt;
-        if (thing.gun_cooldown < dt) {
+        if (thing.gun_cooldown < 0.0) {
             thing.gun_cooldown = 0.0;
         }
 
@@ -111,6 +111,7 @@ fn thingUpdate(game: *Game, me: Key, dt: f32) void {
         }
 
         if (thing.gun_cooldown == 0.0 and thing.trigger == true) {
+            thing.gun_cooldown = 0.2;
             _ = game.things.insert(.{
                 .pos = thing.pos,
                 .vel = .{ .x = 128.0 },
@@ -132,7 +133,7 @@ pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
     } else if (platform.isKeyDown(Platform.Key.s)) {
         v.y = 1.0;
     }
-    thing.trigger = platform.isKeyPressed(Platform.Key.space);
+    thing.trigger = platform.isKeyDown(Platform.Key.space);
     const speed = 200.0;
     v = v.mul_scalar(speed);
     thing.vel = v;
@@ -142,8 +143,5 @@ pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
 pub fn enemyUpdate(game: *Game, me: Key, dt: f32) void {
     const thing = game.things.get(me).?;
     thing.vel.x = -160.0;
-    if (thing.pos.x < 0.0) {
-        game.things.delete(me);
-    }
     thingUpdate(game, me, dt);
 }
