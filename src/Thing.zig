@@ -21,8 +21,9 @@ dir_gun: Vec2 = .{ .x = 1.0, .y = 0.0 },
 pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
     const player = game.things.insert(.{
         .pos = pos,
-        .update = &Thing.playerUpdate,
-        .contact = &Thing.playerContact,
+        .update = &Thing.updatePlayer,
+        .contact = &Thing.contactPlayer,
+        .post_update = &Thing.postUpdateThing,
     });
     return player;
 }
@@ -30,7 +31,7 @@ pub fn spawnEnemy(game: *Game, pos: Vec2) Key {
     const enemy = game.things.insert(.{
         .pos = pos,
         .update = Thing.enemyUpdate,
-        .contact = Thing.enemyContact,
+        .contact = Thing.contactEnemy,
     });
     return enemy;
 }
@@ -44,16 +45,16 @@ pub fn rect(self: *const Thing) Rect {
     };
 }
 
-pub fn playerContact(game: *Game, me: Key, other: Key) void {
-    thingContact(game, me, other);
+pub fn contactPlayer(game: *Game, me: Key, other: Key) void {
+    contactThing(game, me, other);
     game.player = null;
 }
 
-pub fn enemyContact(game: *Game, me: Key, other: Key) void {
-    thingContact(game, me, other);
+pub fn contactEnemy(game: *Game, me: Key, other: Key) void {
+    contactThing(game, me, other);
 }
 
-pub fn thingContact(game: *Game, me: Key, _: Key) void {
+pub fn contactThing(game: *Game, me: Key, _: Key) void {
     var pos: Vec2 = .{};
     if (game.things.get(me)) |thing| {
         pos = thing.pos;
@@ -85,7 +86,7 @@ pub fn debrisUpdate(game: *Game, me: Key, dt: f32) void {
     }
 }
 
-pub fn thingPostUpdate(game: *Game, me: Key, _: f32) void {
+pub fn postUpdateThing(game: *Game, me: Key, _: f32) void {
     if (game.things.get(me)) |thing| {
         const min, const max = .{ 16.0, Game.HEIGHT - 16.0 };
         if (thing.pos.y < min) {
@@ -129,7 +130,7 @@ fn thingUpdate(game: *Game, me: Key, dt: f32) void {
     }
 }
 
-pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
+pub fn updatePlayer(game: *Game, me: Key, dt: f32) void {
     const thing = game.things.get(me).?;
     var platform = game.platform;
     var v: Vec2 = .{};
