@@ -33,6 +33,7 @@ pub fn spawnEnemy(game: *Game, pos: Vec2) Key {
         .pos = pos,
         .update = Thing.updateEnemy,
         .contact = Thing.contactEnemy,
+        .firerate_gun = 0.66,
     });
     return enemy;
 }
@@ -123,7 +124,7 @@ fn updateThing(game: *Game, me: Key, dt: f32) void {
         if (thing.cooldown_gun == 0.0 and thing.trigger_gun == true) {
             // spawn bullet
             const v = thing.dir_gun.mul(f32, 200.0);
-            thing.cooldown_gun = 0.33;
+            thing.cooldown_gun = thing.firerate_gun;
             _ = game.things.insert(.{
                 .pos = thing.pos,
                 .vel = v,
