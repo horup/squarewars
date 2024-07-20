@@ -13,6 +13,7 @@ update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 post_update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
 ignore_contact: ?Key = null,
+ignore_group: ?u8 = null,
 gun_cooldown: f32 = 0.0,
 trigger: bool = false,
 dir_gun: Vec2 = .{ .x = 1.0, .y = 0.0 },
@@ -112,6 +113,7 @@ fn thingUpdate(game: *Game, me: Key, dt: f32) void {
         }
 
         if (thing.gun_cooldown == 0.0 and thing.trigger == true) {
+            // spawn bullet
             const v = thing.dir_gun.mul(f32, 200.0);
             thing.gun_cooldown = 0.33;
             _ = game.things.insert(.{
@@ -119,6 +121,7 @@ fn thingUpdate(game: *Game, me: Key, dt: f32) void {
                 .vel = v,
                 .size = 4.0,
                 .ignore_contact = me,
+                .ignore_group = 1,
                 .update = thingUpdate,
                 .contact = projectileContact,
             });
