@@ -146,9 +146,14 @@ pub fn updatePlayer(game: *Game, me: Key, dt: f32) void {
     } else if (platform.isKeyDown(Platform.Key.s)) {
         v.y = 1.0;
     }
+    if (platform.isKeyDown(Platform.Key.a)) {
+        v.x = -1.0;
+    } else if (platform.isKeyDown(Platform.Key.d)) {
+        v.x = 1.0;
+    }
     thing.trigger_gun = platform.isKeyDown(Platform.Key.space);
     const speed = 200.0;
-    v = v.mul(f32, speed);
+    v = v.normalize().mul(f32, speed);
     thing.vel = v;
     updateThing(game, me, dt);
 }

@@ -14,6 +14,8 @@ pub const Key = enum(i32) {
     space = 32,
     w = 87,
     s = 83,
+    a = 65,
+    d = 68,
 };
 
 const Self = @This();

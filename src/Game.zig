@@ -214,8 +214,8 @@ fn update_gaming(self: *Game, dt: f32) void {
     self.update_things(dt);
     self.physics(dt);
     self.process_contacts();
-    self.draw(dt);
     self.post_update_things(dt);
+    self.draw(dt);
 
     if (self.game_time > 5.0) {
         // spawn enemeis
