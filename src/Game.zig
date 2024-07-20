@@ -97,7 +97,7 @@ fn physics(self: *Game, dt: f32) void {
 
     while (things.next()) |kv| {
         const key, const thing = kv;
-        const new_pos = thing.pos.add(thing.vel.mul_scalar(dt));
+        const new_pos = thing.pos.add(thing.vel.mul(f32, dt));
         thing.pos = new_pos;
         if (!thing.solid) {
             continue;

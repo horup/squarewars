@@ -15,7 +15,7 @@ contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
 ignore_contact: ?Key = null,
 gun_cooldown: f32 = 0.0,
 trigger: bool = false,
-gun_dir: Vec2 = .{ .x = 1.0, .y = 0.0 },
+dir_gun: Vec2 = .{ .x = 1.0, .y = 0.0 },
 
 pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
     const player = game.things.insert(.{
@@ -66,7 +66,7 @@ pub fn thingContact(game: *Game, me: Key, _: Key) void {
             .solid = false,
             .size = 8.0,
             .pos = pos,
-            .vel = v.mul_scalar(60.0),
+            .vel = v.mul(f32, 60.0),
             .update = debrisUpdate,
         });
     }
@@ -112,7 +112,7 @@ fn thingUpdate(game: *Game, me: Key, dt: f32) void {
         }
 
         if (thing.gun_cooldown == 0.0 and thing.trigger == true) {
-            const v = thing.gun_dir.mul_scalar(200.0);
+            const v = thing.dir_gun.mul(f32, 200.0);
             thing.gun_cooldown = 0.33;
             _ = game.things.insert(.{
                 .pos = thing.pos,
@@ -137,7 +137,7 @@ pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
     }
     thing.trigger = platform.isKeyDown(Platform.Key.space);
     const speed = 200.0;
-    v = v.mul_scalar(speed);
+    v = v.mul(f32, speed);
     thing.vel = v;
     thingUpdate(game, me, dt);
 }
@@ -145,5 +145,19 @@ pub fn playerUpdate(game: *Game, me: Key, dt: f32) void {
 pub fn enemyUpdate(game: *Game, me: Key, dt: f32) void {
     const thing = game.things.get(me).?;
     thing.vel.x = -160.0;
+    if (thing.pos.x < Game.WIDTH - 64.0) {
+        thing.trigger = true;
+    }
+    if (thing.pos.x < 64.0) {
+        thing.trigger = false;
+    }
+    if (game.player) |player| {
+        if (game.things.get(player)) |thing_player| {
+            const n = thing_player.pos.sub(thing.pos).normalize();
+            thing.dir_gun = n;
+        }
+    } else {
+        thing.trigger = false;
+    }
     thingUpdate(game, me, dt);
 }
