@@ -14,8 +14,9 @@ post_update: ?*const fn (game: *Game, me: Key, dt: f32) void = null,
 contact: ?*const fn (game: *Game, me: Key, other: Key) void = null,
 ignore_contact: ?Key = null,
 ignore_group: ?u8 = null,
-gun_cooldown: f32 = 0.0,
-trigger: bool = false,
+cooldown_gun: f32 = 0.0,
+firerate_gun: f32 = 0.33,
+trigger_gun: bool = false,
 dir_gun: Vec2 = .{ .x = 1.0, .y = 0.0 },
 
 pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
@@ -23,14 +24,14 @@ pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
         .pos = pos,
         .update = &Thing.updatePlayer,
         .contact = &Thing.contactPlayer,
-        .post_update = &Thing.postUpdateThing,
+        .post_update = &Thing.postUpdatePlayer,
     });
     return player;
 }
 pub fn spawnEnemy(game: *Game, pos: Vec2) Key {
     const enemy = game.things.insert(.{
         .pos = pos,
-        .update = Thing.enemyUpdate,
+        .update = Thing.updateEnemy,
         .contact = Thing.contactEnemy,
     });
     return enemy;
@@ -69,14 +70,14 @@ pub fn contactThing(game: *Game, me: Key, _: Key) void {
             .size = 8.0,
             .pos = pos,
             .vel = v.mul(f32, 60.0),
-            .update = debrisUpdate,
+            .update = updateDebris,
         });
     }
 
     game.things.delete(me);
 }
 
-pub fn debrisUpdate(game: *Game, me: Key, dt: f32) void {
+pub fn updateDebris(game: *Game, me: Key, dt: f32) void {
     if (game.things.get(me)) |thing| {
         thing.size -= dt * 10.0;
         if (thing.size <= 0.0) {
@@ -86,26 +87,32 @@ pub fn debrisUpdate(game: *Game, me: Key, dt: f32) void {
     }
 }
 
-pub fn postUpdateThing(game: *Game, me: Key, _: f32) void {
+pub fn postUpdatePlayer(game: *Game, me: Key, _: f32) void {
     if (game.things.get(me)) |thing| {
-        const min, const max = .{ 16.0, Game.HEIGHT - 16.0 };
-        if (thing.pos.y < min) {
-            thing.pos.y = min;
-        } else if (thing.pos.y > max) {
-            thing.pos.y = max;
+        const min_y, const max_y = .{ 16.0, Game.HEIGHT - 16.0 };
+        const min_x, const max_x = .{ 16.0, Game.WIDTH - 64.0 };
+        if (thing.pos.y < min_y) {
+            thing.pos.y = min_y;
+        } else if (thing.pos.y > max_y) {
+            thing.pos.y = max_y;
+        }
+        if (thing.pos.x < min_x) {
+            thing.pos.x = min_x;
+        } else if (thing.pos.x > max_x) {
+            thing.pos.x = max_x;
         }
     }
 }
 
-fn projectileContact(game: *Game, me: Key, _: Key) void {
+fn contactProjectile(game: *Game, me: Key, _: Key) void {
     game.things.delete(me);
 }
 
-fn thingUpdate(game: *Game, me: Key, dt: f32) void {
+fn updateThing(game: *Game, me: Key, dt: f32) void {
     if (game.things.get(me)) |thing| {
-        thing.gun_cooldown -= dt;
-        if (thing.gun_cooldown < 0.0) {
-            thing.gun_cooldown = 0.0;
+        thing.cooldown_gun -= dt;
+        if (thing.cooldown_gun < 0.0) {
+            thing.cooldown_gun = 0.0;
         }
         const margin = 128.0;
         if (thing.pos.x < -margin or thing.pos.x > Game.WIDTH + margin) {
@@ -113,18 +120,18 @@ fn thingUpdate(game: *Game, me: Key, dt: f32) void {
             return;
         }
 
-        if (thing.gun_cooldown == 0.0 and thing.trigger == true) {
+        if (thing.cooldown_gun == 0.0 and thing.trigger_gun == true) {
             // spawn bullet
             const v = thing.dir_gun.mul(f32, 200.0);
-            thing.gun_cooldown = 0.33;
+            thing.cooldown_gun = 0.33;
             _ = game.things.insert(.{
                 .pos = thing.pos,
                 .vel = v,
                 .size = 4.0,
                 .ignore_contact = me,
                 .ignore_group = 1,
-                .update = thingUpdate,
-                .contact = projectileContact,
+                .update = updateThing,
+                .contact = contactProjectile,
             });
         }
     }
@@ -139,21 +146,21 @@ pub fn updatePlayer(game: *Game, me: Key, dt: f32) void {
     } else if (platform.isKeyDown(Platform.Key.s)) {
         v.y = 1.0;
     }
-    thing.trigger = platform.isKeyDown(Platform.Key.space);
+    thing.trigger_gun = platform.isKeyDown(Platform.Key.space);
     const speed = 200.0;
     v = v.mul(f32, speed);
     thing.vel = v;
-    thingUpdate(game, me, dt);
+    updateThing(game, me, dt);
 }
 
-pub fn enemyUpdate(game: *Game, me: Key, dt: f32) void {
+pub fn updateEnemy(game: *Game, me: Key, dt: f32) void {
     const thing = game.things.get(me).?;
     thing.vel.x = -160.0;
     if (thing.pos.x < Game.WIDTH - 64.0) {
-        thing.trigger = true;
+        thing.trigger_gun = true;
     }
     if (thing.pos.x < 64.0) {
-        thing.trigger = false;
+        thing.trigger_gun = false;
     }
     if (game.player) |player| {
         if (game.things.get(player)) |thing_player| {
@@ -161,7 +168,7 @@ pub fn enemyUpdate(game: *Game, me: Key, dt: f32) void {
             thing.dir_gun = n;
         }
     } else {
-        thing.trigger = false;
+        thing.trigger_gun = false;
     }
-    thingUpdate(game, me, dt);
+    updateThing(game, me, dt);
 }

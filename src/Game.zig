@@ -199,12 +199,23 @@ fn update_things(self: *Game, dt: f32) void {
     }
 }
 
+fn post_update_things(self: *Game, dt: f32) void {
+    var things = self.things.iter();
+    while (things.next()) |kv| {
+        const key, const thing = kv;
+        if (thing.post_update) |f| {
+            f(self, key, dt);
+        }
+    }
+}
+
 fn update_gaming(self: *Game, dt: f32) void {
     var platform = self.platform;
     self.update_things(dt);
     self.physics(dt);
     self.process_contacts();
     self.draw(dt);
+    self.post_update_things(dt);
 
     if (self.game_time > 5.0) {
         // spawn enemeis
