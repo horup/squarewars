@@ -187,6 +187,10 @@ fn draw(self: *Game, _: f32) void {
         const color = .{ .g = 255 };
         platform.drawSquare(x, y, size, color);
     }
+
+    const score = std.fmt.allocPrintZ(platform.allocator, "SCORE: {d}", .{self.score}) catch unreachable;
+    defer platform.allocator.free(score);
+    platform.drawText(score, Game.WIDTH / 2.0, 16.0, 16.0, .{});
 }
 
 fn update_things(self: *Game, dt: f32) void {
