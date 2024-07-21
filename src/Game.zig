@@ -200,7 +200,7 @@ fn draw(self: *Game, _: f32) void {
         platform.drawText(time, Game.WIDTH - margin - w, margin, 16.0, .{});
     }
     {
-        const time = std.fmt.allocPrintZ(platform.allocator, "\n{d}", .{self.score}) catch unreachable;
+        const time = std.fmt.allocPrintZ(platform.allocator, "\n{d:.0}", .{self.game_time}) catch unreachable;
         defer platform.allocator.free(time);
         const w = platform.measureText(time, 16.0);
         platform.drawText(time, Game.WIDTH - margin - w, margin, 16.0, .{});
