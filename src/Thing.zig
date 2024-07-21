@@ -53,6 +53,7 @@ pub fn contactPlayer(game: *Game, me: Key, other: Key) void {
 }
 
 pub fn contactEnemy(game: *Game, me: Key, other: Key) void {
+    game.score += 100;
     contactThing(game, me, other);
 }
 
