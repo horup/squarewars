@@ -188,9 +188,23 @@ fn draw(self: *Game, _: f32) void {
         platform.drawSquare(x, y, size, color);
     }
 
-    const score = std.fmt.allocPrintZ(platform.allocator, "SCORE: {d}", .{self.score}) catch unreachable;
+    const margin = 8.0;
+    const score = std.fmt.allocPrintZ(platform.allocator, "SCORE\n{d}", .{self.score}) catch unreachable;
     defer platform.allocator.free(score);
-    platform.drawText(score, Game.WIDTH / 2.0, 16.0, 16.0, .{});
+    platform.drawText(score, margin, margin, 16.0, .{});
+
+    {
+        const time = std.fmt.allocPrintZ(platform.allocator, "TIME", .{}) catch unreachable;
+        defer platform.allocator.free(time);
+        const w = platform.measureText(time, 16.0);
+        platform.drawText(time, Game.WIDTH - margin - w, margin, 16.0, .{});
+    }
+    {
+        const time = std.fmt.allocPrintZ(platform.allocator, "\n{d}", .{self.score}) catch unreachable;
+        defer platform.allocator.free(time);
+        const w = platform.measureText(time, 16.0);
+        platform.drawText(time, Game.WIDTH - margin - w, margin, 16.0, .{});
+    }
 }
 
 fn update_things(self: *Game, dt: f32) void {
