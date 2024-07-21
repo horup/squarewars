@@ -1,4 +1,5 @@
 const Game = @This();
+const Highscore = @import("Highscore.zig");
 const std = @import("std");
 const Vec2 = @import("Vec2.zig");
 const Platform = @import("Platform.zig");
@@ -13,15 +14,14 @@ const State = enum {
     title,
     gaming,
 };
+highscore: Highscore,
 contacts: std.ArrayList(Contact),
 things: Arena(Thing),
 state: State = State.title,
 platform: Platform,
 score: i32 = 0,
-score_best: i32 = 0,
 player: ?Key = null,
 game_time: f32 = 0.0,
-game_time_best: f32 = 0.0,
 timer_1hz: f32 = 0.0,
 delay_countdown: f32 = 0.5,
 spawn_countdown: f32 = 0.0,
@@ -30,7 +30,10 @@ spawn_pos: f32 = 0.0,
 respawn_countdown: f32 = 2.0,
 
 pub fn init(platform: Platform) Game {
+    var highscore: Highscore = .{};
+    highscore.load();
     return Game{
+        .highscore = highscore,
         .contacts = std.ArrayList(Contact).init(platform.allocator),
         .platform = platform,
         .things = Arena(Thing).init(platform.allocator),
