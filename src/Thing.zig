@@ -29,11 +29,13 @@ pub fn spawnPlayer(game: *Game, pos: Vec2) Key {
     return player;
 }
 pub fn spawnEnemy(game: *Game, pos: Vec2) Key {
+    const half = @floor(game.game_time / 20.0);
+    const firerate_gun = 1.0 / half;
     const enemy = game.things.insert(.{
         .pos = pos,
         .update = Thing.updateEnemy,
         .contact = Thing.contactEnemy,
-        .firerate_gun = 0.66,
+        .firerate_gun = firerate_gun,
     });
     return enemy;
 }
