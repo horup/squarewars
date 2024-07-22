@@ -31,7 +31,7 @@ respawn_countdown: f32 = 2.0,
 
 pub fn init(platform: Platform) Game {
     var highscore: Highscore = .{};
-    highscore.load();
+    highscore.load(platform.allocator) catch {};
     return Game{
         .highscore = highscore,
         .contacts = std.ArrayList(Contact).init(platform.allocator),
