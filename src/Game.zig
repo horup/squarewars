@@ -258,21 +258,38 @@ fn update_gaming(self: *Game, dt: f32) void {
     } else {
         // show instructions
         const center_x = Game.WIDTH / 2.0;
-        const text_y = 64.0;
+        const text_y = 64.0 + 16.0;
         const height = 16.0;
         {
             const s = "Fly up and down using 'W' and 'S'\n\nShoot using 'Space'\n\nSurvive as long as you can!";
             platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, text_y - height, height, Platform.Color{});
         }
+        {
+            const s = std.fmt.allocPrintZ(platform.allocator, "HIGHSCORE: {d}", .{self.highscore.score}) catch {
+                unreachable;
+            };
+            defer platform.allocator.free(s);
+            platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, text_y - height * 3.0, height, Platform.Color{});
+        }
     }
 
     if (self.player == null) {
         // play is no more, allow respawning after some time
+        const center_x = Game.WIDTH / 2.0;
+        const center_y = Game.HEIGHT / 2.0;
+        const height = 32.0;
+
         self.respawn_countdown -= dt;
+        if (self.score > self.highscore.score) {
+            self.highscore.score = self.score;
+            self.highscore.time = self.game_time;
+            self.highscore.save(platform.allocator) catch {};
+        }
+        if (self.score == self.highscore.score) {
+            const s = "NEW HIGHSCORE!";
+            platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, 32.0, height, Platform.Color{});
+        }
         if (self.respawn_countdown <= 1.0) {
-            const center_x = Game.WIDTH / 2.0;
-            const center_y = Game.HEIGHT / 2.0;
-            const height = 32.0;
             {
                 const s = "YOU WERE";
                 platform.drawText(s, center_x - platform.measureText(s, height) / 2.0, center_y - height, height, Platform.Color{});
