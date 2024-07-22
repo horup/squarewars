@@ -125,7 +125,7 @@ fn physics(self: *Game, dt: f32) void {
                     continue;
                 }
             }
-            if (thing.ignore_group == thing2.ignore_group) {
+            if (thing.ignore_group != null and thing.ignore_group == thing2.ignore_group) {
                 continue;
             }
             if (!thing2.solid) {
